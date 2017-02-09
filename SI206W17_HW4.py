@@ -15,13 +15,14 @@ import pickle
 
 ## Write the Python code to do so here.
 data_requests=requests.get("http://www.nytimes.com").text 
-# when dumping data 
-# f = open('nytimes_data.html', 'wb')
+# WHEN DUMPING DATA 
+f = open('nytimes_data.html', 'w')
 # pickle.dump(data_requests,f)
-# f.close()
-# when loading data 
-f=open('nytimes_data.html','rb')
-times_data=pickle.load(f)
+f.write(data_requests)
+f.close()
+# WHEN LOADING DATA 
+f=open('nytimes_data.html','r')
+times_data=f.read()
 f.close()
 
 
@@ -54,10 +55,13 @@ f.close()
 ## HINT: Remember that you'll need to open the file you created in Part 1, read the contets into one big string, and make a BeautifulSoup object out of that string!
 ## NOTE that the provided link does not include saving the online data in a file as part of the process. But it still provides very useful hints/tricks about how to look for and identify the headlines on the NY Times page.
 nytimes_headlines=[]
-soup=BeautifulSoup(times_data)
-headlines=soup.find_all("h2",{"class":"story-heading"})
+soup=BeautifulSoup(times_data,"html.parser")  
+headlines=soup.find_all(class_="story-heading") 
 for x in headlines:
-	nytimes_headlines.append(x)
+	if x.a:
+		nytimes_headlines.append(x.a.text.replace("\n"," ").strip())  
+	else:
+		nytimes_headlines.append(x.contents[0].strip()) 
 print(nytimes_headlines)
 
 
