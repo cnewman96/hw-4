@@ -17,7 +17,7 @@ import pickle
 data_requests=requests.get("http://www.nytimes.com").text 
 # WHEN DUMPING DATA 
 f = open('nytimes_data.html', 'w')
-# pickle.dump(data_requests,f)
+
 f.write(data_requests)
 f.close()
 # WHEN LOADING DATA 
@@ -54,15 +54,18 @@ f.close()
 ## Write your code to complete this task here.
 ## HINT: Remember that you'll need to open the file you created in Part 1, read the contets into one big string, and make a BeautifulSoup object out of that string!
 ## NOTE that the provided link does not include saving the online data in a file as part of the process. But it still provides very useful hints/tricks about how to look for and identify the headlines on the NY Times page.
-nytimes_headlines=[]
+headlines_1=[]
 soup=BeautifulSoup(times_data,"html.parser")  
 headlines=soup.find_all(class_="story-heading") 
 for x in headlines:
 	if x.a:
-		nytimes_headlines.append(x.a.text.replace("\n"," ").strip())  
+		headlines_1.append(x.a.text.replace("\n"," ").strip())  
 	else:
-		nytimes_headlines.append(x.contents[0].strip()) 
-print(nytimes_headlines)
+		headlines_1.append(x.contents[0].strip()) 
+nytimes_headlines=headlines_1[0:10] 
+
+
+
 
 
 #####################
@@ -84,10 +87,38 @@ print(nytimes_headlines)
 
 response = requests.get("https://www.si.umich.edu/directory?field_person_firstname_value=&field_person_lastname_value=&rid=All")
 htmldoc = response.text
-
-soup = BeautifulSoup(htmldoc,"html.parser")
+z = open("umsi", 'w')
+z.write(htmldoc)
+z.close()
+f=open('umsi','r')
+SI_data=f.read()
+f.close()
+soup = BeautifulSoup(SI_data,"html.parser")
 people = soup.find_all("div",{"class":"views-row"})
-umsi_titles = {}
+keys=[]
+for x in people:
+	y=x.find_all("div",{"property":"dc:title"})
+	q=y[0].text
+	keys.append(q)
+values=[]	
+jobs=soup.find_all("div", {"class":"field field-name-field-person-titles field-type-text field-label-hidden"})
+for x in jobs:
+	z=x.text
+	values.append(z)
+umsi_titles=dict(zip(keys, values))
+
+
+	
+
+
+
+
+	
+
+
+
+
+
 
 ## It may be helpful to translate the following from English to code:
 
@@ -112,7 +143,7 @@ class HW4_Part2(unittest.TestCase):
 	def test_first_last_elem(self):
 		self.assertEqual(type(nytimes_headlines[0]),type(""), "Testing that the first type in the nytimes_headlines list is a string")
 		self.assertEqual(type(nytimes_headlines[-1]),type(""), "Testing that the last type in the nytimes_headlines list is a string")
-	def length_of_ten(self):
+	def test_length_of_ten(self):
 		self.assertEqual(len(nytimes_headlines),10, "Testing that there are ten headlines in the list")
 
 class HW4_Part3(unittest.TestCase):
